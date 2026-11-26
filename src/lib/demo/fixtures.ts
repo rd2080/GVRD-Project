@@ -6,7 +6,8 @@ export const CONSENT_PURPOSES = [
   "referral",
 ] as const;
 export type ConsentPurpose = (typeof CONSENT_PURPOSES)[number];
-export type ConsentState = "not_asked" | "granted" | "revoked";
+// refused: the patient declined at the first ask. revoked: the patient withdrew an earlier consent.
+export type ConsentState = "not_asked" | "granted" | "refused" | "revoked";
 
 export type DemoPatient = {
   id: string;
