@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test src/lib/screening/instruments.test.mts",
+    "test": "node --test src/lib/screening/instruments.test.mts src/lib/demo/mode.test.mts",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs"
   },
   "dependencies": {

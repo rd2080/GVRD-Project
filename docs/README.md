@@ -14,5 +14,6 @@ Index of the technical documentation. Status values: **Draft** (written, not rev
 | [subprocessors.md](subprocessors.md) | Third parties that handle data | Draft |
 | [pages.md](pages.md) | Every app page, who uses it, MVP scope and blocking decisions | Proposed |
 | [development-method.md](development-method.md) | How we build: stages, gates, roles, sprints, definitions of ready and done | Draft |
+| [demo-mode.md](demo-mode.md) | Demo mode for screen approval, with synthetic data and the approval record | Draft |
 
 Open questions and decisions are tracked in the GVRD Decisions, Gaps and Risks Tracker (Google Sheet), using the IDs G-xx and D-xx.
