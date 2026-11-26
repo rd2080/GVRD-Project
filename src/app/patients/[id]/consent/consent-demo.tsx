@@ -123,7 +123,10 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
             If you feel unsafe right now, call your local emergency number or go to the nearest
             emergency department.
           </li>
-          <li>Only your gynaecologist and the team they choose can see your results.</li>
+          <li>
+            Your gynaecologist and the team they choose can see your results. A psychologist can see
+            your report only if you agree to share it.
+          </li>
         </ul>
       </section>
 
