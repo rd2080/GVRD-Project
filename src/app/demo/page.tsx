@@ -19,13 +19,14 @@ export default function DemoIndex() {
             C-01 Consent
           </h2>
           <p className="mt-1 text-sm text-stone-700">Version v0.1 · Waiting for GV review</p>
-          <p className="mt-4 text-sm font-medium">Open with an example patient</p>
+          <p className="mt-1 text-sm text-stone-700">Consent is a dialog on the patient record, given by the patient.</p>
+          <p className="mt-4 text-sm font-medium">Open an example patient record</p>
           <ul className="mt-2 space-y-2">
             {listDemoPatients().map((p) => (
               <li key={p.id}>
                 <Link
                   className="text-[#0f5e5a] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f5e5a]"
-                  href={`/patients/${p.id}/consent`}
+                  href={`/patients/${p.id}`}
                 >
                   {p.label}
                 </Link>
@@ -39,14 +40,15 @@ export default function DemoIndex() {
             Reviewer notes for GV (C-01, demo only)
           </h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Who uses this screen? The clinician records what the patient says, and the wording is read aloud to the patient. Confirm.</li>
+            <li>The patient gives consent themselves, on a device the clinician hands over. The dialog opens from the patient record. Confirm.</li>
             <li>Withdrawing screening withdraws sharing with a psychologist too. The demo does this, with a history entry. Confirm.</li>
             <li>Sharing needs screening consent first. The demo enforces this.</li>
             <li>What happens to existing records after a patient stops agreeing is pending (G-17).</li>
             <li>The &ldquo;What you should know&rdquo; wording is placeholder until legal review (G-25).</li>
             <li>The safety alert wording must match the pathway GV approves (G-07).</li>
             <li>An approved helpline number must be added beside the emergency guidance (G-08). The demo has none yet.</li>
-            <li>A real record is append-only and stored in the database, with the clinician and method captured.</li>
+            <li>How the patient is identified on a shared device is not decided. This must be settled before real use.</li>
+            <li>A real record is append-only and stored in the database, with the patient, the device and the method captured.</li>
           </ul>
         </section>
       </main>
