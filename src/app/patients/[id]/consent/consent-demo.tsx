@@ -106,8 +106,6 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
           <dd>{patient.recordNumber}</dd>
           <dt className="text-stone-700">Date of birth</dt>
           <dd>{patient.dateOfBirth}</dd>
-          <dt className="text-stone-700">Consent text</dt>
-          <dd>{CONSENT_TEXT_VERSION}</dd>
         </dl>
       </header>
 
@@ -126,7 +124,6 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
             emergency department.
           </li>
           <li>Only your gynaecologist and the team they choose can see your results.</li>
-          <li>We will explain how long we keep your information before you agree.</li>
         </ul>
       </section>
 
@@ -156,8 +153,10 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                     {`Do you want to stop agreeing to "${text.title}"?`}
                   </p>
                   <p className="mt-1 text-stone-800">
-                    We will stop using this from now on. We will explain what happens to records you
-                    have already given.
+                    We will stop using this from now on.
+                    {purpose === "screening" && consents.share_report_with_psychologist === "granted"
+                      ? " Sharing your report with a psychologist will also stop."
+                      : ""}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button

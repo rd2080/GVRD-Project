@@ -38,7 +38,7 @@ const RAW_PATIENTS: Omit<DemoPatient, "recordNumber" | "dateOfBirth">[] = [
   },
   {
     id: "demo-003",
-    label: "Example patient C (new, no consents yet)",
+    label: "Example patient C",
     consents: {
       screening: "not_asked",
       share_report_with_psychologist: "not_asked",
