@@ -20,7 +20,7 @@ export type DemoPatient = {
 const RAW_PATIENTS: Omit<DemoPatient, "recordNumber" | "dateOfBirth">[] = [
   {
     id: "demo-001",
-    label: "Synthetic patient A",
+    label: "Example patient A",
     consents: {
       screening: "granted",
       share_report_with_psychologist: "not_asked",
@@ -29,7 +29,7 @@ const RAW_PATIENTS: Omit<DemoPatient, "recordNumber" | "dateOfBirth">[] = [
   },
   {
     id: "demo-002",
-    label: "Synthetic patient B",
+    label: "Example patient B",
     consents: {
       screening: "revoked",
       share_report_with_psychologist: "revoked",
@@ -38,7 +38,7 @@ const RAW_PATIENTS: Omit<DemoPatient, "recordNumber" | "dateOfBirth">[] = [
   },
   {
     id: "demo-003",
-    label: "Synthetic patient C (new, no consents yet)",
+    label: "Example patient C (new, no consents yet)",
     consents: {
       screening: "not_asked",
       share_report_with_psychologist: "not_asked",
@@ -51,7 +51,7 @@ const RAW_PATIENTS: Omit<DemoPatient, "recordNumber" | "dateOfBirth">[] = [
 const DEMO_PATIENTS: DemoPatient[] = RAW_PATIENTS.map((p, i) => ({
   ...p,
   recordNumber: `DEMO-${String(i + 1).padStart(4, "0")}`,
-  dateOfBirth: `${1980 + i * 5}`,
+  dateOfBirth: ["14 March 1980", "2 September 1985", "21 January 1990"][i % 3],
 }));
 
 export function getDemoPatient(id: string): DemoPatient | undefined {

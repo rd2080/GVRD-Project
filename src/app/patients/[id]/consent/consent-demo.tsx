@@ -69,7 +69,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
   const stamp = () => new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
   const logEvent = (purpose: ConsentPurpose, event: string) =>
-    `${stamp()} · ${PURPOSE[purpose].title}: ${event}. Recorded by demo clinician, in person. Text ${CONSENT_TEXT_VERSION}.`;
+    `${stamp()} · ${PURPOSE[purpose].title}: ${event}. Recorded by clinician, in person. Text ${CONSENT_TEXT_VERSION}.`;
 
   const record = (purpose: ConsentPurpose, next: ConsentState, event: string) => {
     setConfirming(null);
@@ -126,7 +126,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
             emergency department.
           </li>
           <li>Only your gynaecologist and the team they choose can see your results.</li>
-          <li>We are still confirming how long we keep your information.</li>
+          <li>We will explain how long we keep your information before you agree.</li>
         </ul>
       </section>
 
@@ -156,8 +156,8 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                     {`Do you want to stop agreeing to "${text.title}"?`}
                   </p>
                   <p className="mt-1 text-stone-800">
-                    We will stop using this from now on. We are still confirming what happens to
-                    records you have already given.
+                    We will stop using this from now on. We will explain what happens to records you
+                    have already given.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
