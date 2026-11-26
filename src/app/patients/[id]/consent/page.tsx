@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
 import { isDemoMode } from "@/lib/demo/mode";
-import { getDemoPatient } from "@/lib/demo/fixtures";
+import { getDemoPatient, listDemoPatients } from "@/lib/demo/fixtures";
 import { DemoBanner, NotAvailable } from "@/app/demo/banner";
 import { ConsentDemo } from "./consent-demo";
 
-// Rendered per request: this page will show patient data, so it must never be cached.
-export const dynamic = "force-dynamic";
+// Demo pages are pre-rendered from synthetic fixtures only. The real app must render patient
+// pages per request and never cache them (see docs/security-and-access.md).
+export function generateStaticParams() {
+  return listDemoPatients().map((p) => ({ id: p.id }));
+}
 
 export async function generateMetadata() {
   return { title: isDemoMode() ? "Consent (demo) | GVRD" : "Not available | GVRD" };

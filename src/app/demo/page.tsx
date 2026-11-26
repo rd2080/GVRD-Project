@@ -3,8 +3,6 @@ import { isDemoMode } from "@/lib/demo/mode";
 import { listDemoPatients } from "@/lib/demo/fixtures";
 import { DemoBanner, NotAvailable } from "./banner";
 
-export const dynamic = "force-dynamic";
-
 // Index of demo screens for review. Reviewer notes live here, not on the patient-facing screens.
 export default function DemoIndex() {
   if (!isDemoMode()) return <NotAvailable />;

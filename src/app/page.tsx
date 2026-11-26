@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { isDemoMode } from "@/lib/demo/mode";
+
 export default function Home() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-16">
@@ -10,6 +13,13 @@ export default function Home() {
         Screening interpretation and escalation rules are pending clinical approval, so no results
         are shown here yet.
       </p>
+      {isDemoMode() ? (
+        <p className="mt-6">
+          <Link className="text-[#0f5e5a] underline underline-offset-4" href="/demo">
+            Open the clinical screen demo (synthetic data)
+          </Link>
+        </p>
+      ) : null}
     </main>
   );
 }
