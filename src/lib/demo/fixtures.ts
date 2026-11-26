@@ -51,7 +51,7 @@ const RAW_PATIENTS: Omit<DemoPatient, "recordNumber" | "dateOfBirth">[] = [
 const DEMO_PATIENTS: DemoPatient[] = RAW_PATIENTS.map((p, i) => ({
   ...p,
   recordNumber: `DEMO-${String(i + 1).padStart(4, "0")}`,
-  dateOfBirth: `${1980 + i * 5} (synthetic)`,
+  dateOfBirth: `${1980 + i * 5}`,
 }));
 
 export function getDemoPatient(id: string): DemoPatient | undefined {

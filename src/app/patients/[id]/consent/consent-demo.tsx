@@ -9,7 +9,7 @@ import {
 } from "@/lib/demo/fixtures";
 
 // Wording is placeholder until legal review (G-25) and consent versioning (G-14) are done.
-const CONSENT_TEXT_VERSION = "v0.1 (placeholder)";
+const CONSENT_TEXT_VERSION = "v0.1";
 
 // Plain language. This screen is read aloud to the patient, and the clinician records what she says.
 const PURPOSE: Record<
@@ -69,7 +69,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
   const stamp = () => new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
   const logEvent = (purpose: ConsentPurpose, event: string) =>
-    `${stamp()} · ${PURPOSE[purpose].title}: ${event}. Recorded by Demo clinician (synthetic), in person. Text ${CONSENT_TEXT_VERSION}.`;
+    `${stamp()} · ${PURPOSE[purpose].title}: ${event}. Recorded by demo clinician, in person. Text ${CONSENT_TEXT_VERSION}.`;
 
   const record = (purpose: ConsentPurpose, next: ConsentState, event: string) => {
     setConfirming(null);
@@ -163,7 +163,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                     <button
                       type="button"
                       className={PRIMARY}
-                      aria-label={`Yes, stop agreeing to ${text.title}`}
+                      aria-label={`Yes, I want to stop: ${text.title}`}
                       onClick={() => record(purpose, "revoked", "stopped")}
                     >
                       Yes, I want to stop
@@ -187,7 +187,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                       <button
                         type="button"
                         className={PRIMARY}
-                        aria-label={`I agree to ${text.title}`}
+                        aria-label={`I agree: ${text.title}`}
                         onClick={() => record(purpose, "granted", "agreed")}
                       >
                         I agree
@@ -196,7 +196,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                         <button
                           type="button"
                           className={SECONDARY}
-                          aria-label={`I do not agree to ${text.title}`}
+                          aria-label={`I do not agree: ${text.title}`}
                           onClick={() => record(purpose, "refused", "did not agree")}
                         >
                           I do not agree
@@ -208,7 +208,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                     <button
                       type="button"
                       className={SECONDARY}
-                      aria-label={`I want to stop agreeing to ${text.title}`}
+                      aria-label={`I want to stop: ${text.title}`}
                       onClick={() => startWithdrawal(purpose)}
                     >
                       I want to stop
@@ -218,7 +218,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                     <button
                       type="button"
                       className={PRIMARY}
-                      aria-label={`I agree again to ${text.title}`}
+                      aria-label={`I agree again: ${text.title}`}
                       onClick={() => record(purpose, "granted", "agreed again")}
                     >
                       I agree again
