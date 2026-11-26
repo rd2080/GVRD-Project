@@ -63,16 +63,31 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
   const [confirming, setConfirming] = useState<ConsentPurpose | null>(null);
   const [history, setHistory] = useState<string[]>([]);
 
-  const record = (purpose: ConsentPurpose, next: ConsentState, event: string) => {
-    setConsents((prev) => ({ ...prev, [purpose]: next }));
-    setConfirming(null);
-    const when = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
-    setHistory((prev) => [
-      `${when} · ${PURPOSE[purpose].title}: ${event}. Recorded by Demo clinician (synthetic), in person. Text ${CONSENT_TEXT_VERSION}.`,
-      ...prev,
-    ]);
-    // The buttons that were pressed may disappear, so move focus to the purpose heading instead of the page body.
+  const focusPurpose = (purpose: ConsentPurpose) =>
     requestAnimationFrame(() => document.getElementById(titleId(purpose))?.focus());
+
+  const stamp = () => new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+
+  const logEvent = (purpose: ConsentPurpose, event: string) =>
+    `${stamp()} · ${PURPOSE[purpose].title}: ${event}. Recorded by Demo clinician (synthetic), in person. Text ${CONSENT_TEXT_VERSION}.`;
+
+  const record = (purpose: ConsentPurpose, next: ConsentState, event: string) => {
+    setConfirming(null);
+    // Sharing depends on screening. Withdrawing screening also withdraws any sharing consent, and the history says so.
+    const cascade =
+      purpose === "screening" && next === "revoked" && consents.share_report_with_psychologist === "granted";
+    setConsents((prev) => ({
+      ...prev,
+      [purpose]: next,
+      ...(cascade ? { share_report_with_psychologist: "revoked" as const } : {}),
+    }));
+    const entries = [logEvent(purpose, event)];
+    if (cascade) {
+      entries.push(logEvent("share_report_with_psychologist", "withdrawn because screening was withdrawn"));
+    }
+    setHistory((h) => [...entries, ...h]);
+    // The pressed buttons may disappear, so move focus to the purpose heading, not the page body.
+    focusPurpose(purpose);
   };
 
   return (
@@ -100,8 +115,12 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
             If an answer suggests you may harm yourself, your clinic team will be alerted straight
             away and will act on it.
           </li>
+          <li>
+            If you feel unsafe right now, call your local emergency number or go to the nearest
+            emergency department. A helpline number will be shown here once it is approved (G-08).
+          </li>
           <li>Only your gynaecologist and the team they choose can see your results.</li>
-          <li>How long we keep your information is still being confirmed.</li>
+          <li>We are still confirming how long we keep your information.</li>
         </ul>
       </section>
 
@@ -127,10 +146,10 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                 <p className="mt-4 text-sm text-stone-800">Needs screening consent first.</p>
               ) : confirming === purpose ? (
                 <div className="mt-4 rounded border border-stone-400 bg-stone-50 p-4 text-sm">
-                  <p className="font-medium">Withdraw consent for {text.title.toLowerCase()}?</p>
+                  <p className="font-medium">{`Withdraw consent for "${text.title}"?`}</p>
                   <p className="mt-1 text-stone-800">
-                    This stops any future use. What happens to existing records is still to be
-                    decided (G-17).
+                    This stops any future use. We are still confirming what happens to records you
+                    have already given.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
@@ -142,7 +161,14 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                     >
                       Confirm withdrawal
                     </button>
-                    <button type="button" className={SECONDARY} onClick={() => setConfirming(null)}>
+                    <button
+                      type="button"
+                      className={SECONDARY}
+                      onClick={() => {
+                        setConfirming(null);
+                        focusPurpose(purpose);
+                      }}
+                    >
                       Keep consent
                     </button>
                   </div>
@@ -210,18 +236,16 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
             <li key={i}>{entry}</li>
           ))}
         </ol>
-        <p className="mt-3 text-xs text-stone-700">
-          Demo only: a real record is append-only and stored in the database.
-        </p>
       </section>
 
       <aside className="mt-10 border border-dashed border-stone-500 p-5 text-sm text-stone-800">
         <p className="font-medium">Reviewer notes for GV (demo only, remove before build)</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>Who sees this screen: the clinician, or the patient? The copy is written to be read to the patient.</li>
-          <li>Sharing with a psychologist needs screening consent first. The demo enforces this. Withdrawing screening should also withdraw sharing; the demo does not do that yet.</li>
+          <li>Withdrawing screening withdraws sharing with a psychologist too. The demo does this, with a history entry. GV to confirm.</li>
           <li>Withdrawal stops future use. What happens to existing records is pending (G-17).</li>
-          <li>The &ldquo;What you should know&rdquo; wording is placeholder until legal review (G-25), and the safety alert wording must match the pathway GV approves (G-07, G-08).</li>
+          <li>The &ldquo;What you should know&rdquo; wording is placeholder until legal review (G-25). The safety alert and helpline text must match the pathway GV approves (G-07, G-08).</li>
+          <li>Demo only: a real record is append-only and stored in the database, with the clinician and method captured.</li>
         </ul>
       </aside>
     </main>
