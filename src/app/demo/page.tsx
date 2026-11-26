@@ -5,45 +5,36 @@ import { DemoBanner, NotAvailable } from "./banner";
 
 export const dynamic = "force-dynamic";
 
-// Index of demo screens for review. Lists each screen ID, its version, and its synthetic patients.
+// Index of demo screens for review. Each screen is listed once, with its version and example patients.
 export default function DemoIndex() {
   if (!isDemoMode()) return <NotAvailable />;
 
   return (
     <>
       <DemoBanner screenId="index" version="" />
-      <main className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="text-2xl font-semibold">Demo screens</h1>
-        <p className="mt-2 text-zinc-600">Synthetic data only. Each screen is pending GV approval.</p>
+      <main className="mx-auto max-w-2xl px-6 py-10 text-stone-900">
+        <h1 className="font-serif text-3xl">Demo screens</h1>
+        <p className="mt-2 text-stone-700">Synthetic data only. Each screen is waiting for GV approval.</p>
 
-        <table className="mt-8 w-full text-left text-sm">
-          <thead className="border-b text-zinc-500">
-            <tr>
-              <th className="py-2">Screen</th>
-              <th className="py-2">Version</th>
-              <th className="py-2">Status</th>
-              <th className="py-2">Open with</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b align-top">
-              <td className="py-3">C-01 Consent</td>
-              <td className="py-3">v0.1</td>
-              <td className="py-3">Awaiting GV review</td>
-              <td className="py-3">
-                <ul className="space-y-1">
-                  {listDemoPatients().map((p) => (
-                    <li key={p.id}>
-                      <Link className="underline" href={`/patients/${p.id}/consent`}>
-                        {p.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <section aria-labelledby="screen-c01" className="mt-8 border-l-4 border-l-stone-300 bg-white p-5">
+          <h2 id="screen-c01" className="text-lg font-medium">
+            C-01 Consent
+          </h2>
+          <p className="mt-1 text-sm text-stone-700">Version v0.1 · Waiting for GV review</p>
+          <p className="mt-4 text-sm font-medium">Open with an example patient</p>
+          <ul className="mt-2 space-y-2">
+            {listDemoPatients().map((p) => (
+              <li key={p.id}>
+                <Link
+                  className="text-[#0f5e5a] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f5e5a]"
+                  href={`/patients/${p.id}/consent`}
+                >
+                  {p.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
     </>
   );

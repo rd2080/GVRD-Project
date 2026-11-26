@@ -11,10 +11,12 @@ export type ConsentState = "not_asked" | "granted" | "revoked";
 export type DemoPatient = {
   id: string;
   label: string;
+  recordNumber: string;
+  dateOfBirth: string;
   consents: Record<ConsentPurpose, ConsentState>;
 };
 
-const DEMO_PATIENTS: DemoPatient[] = [
+const RAW_PATIENTS: Omit<DemoPatient, "recordNumber" | "dateOfBirth">[] = [
   {
     id: "demo-001",
     label: "Synthetic patient A",
@@ -43,6 +45,13 @@ const DEMO_PATIENTS: DemoPatient[] = [
     },
   },
 ];
+
+// Synthetic identifiers, so the screen can show the two identifiers a clinical record needs.
+const DEMO_PATIENTS: DemoPatient[] = RAW_PATIENTS.map((p, i) => ({
+  ...p,
+  recordNumber: `DEMO-${String(i + 1).padStart(4, "0")}`,
+  dateOfBirth: `${1980 + i * 5} (synthetic)`,
+}));
 
 export function getDemoPatient(id: string): DemoPatient | undefined {
   return DEMO_PATIENTS.find((p) => p.id === id);

@@ -7,6 +7,10 @@ import { ConsentDemo } from "./consent-demo";
 // Rendered per request: this page will show patient data, so it must never be cached.
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata() {
+  return { title: isDemoMode() ? "Consent (demo) | GVRD" : "Not available | GVRD" };
+}
+
 export default async function ConsentPage({ params }: { params: Promise<{ id: string }> }) {
   if (!isDemoMode()) return <NotAvailable />;
 

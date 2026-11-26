@@ -9,94 +9,201 @@ import {
 } from "@/lib/demo/fixtures";
 
 // Wording is placeholder until legal review (G-25) and consent versioning (G-14) are done.
-const PURPOSE_TEXT: Record<ConsentPurpose, { title: string; body: string; collects: string }> = {
+const CONSENT_TEXT_VERSION = "v0.1 (placeholder)";
+
+// Plain language, written to be read aloud to the patient.
+const PURPOSE: Record<
+  ConsentPurpose,
+  { title: string; body: string; keep: string; needsScreening: boolean }
+> = {
   screening: {
     title: "Psychological screening",
-    body: "Complete short questionnaires during this consultation and have the scores calculated.",
-    collects: "Answers to the questionnaire and the calculated scores.",
+    body: "We would like you to answer some short questions today, and we will work out your scores. You can say no.",
+    keep: "Your answers and your scores.",
+    needsScreening: false,
   },
   share_report_with_psychologist: {
-    title: "Share the report with a psychologist",
-    body: "Let your gynaecologist share your screening report with a psychologist, if you are referred.",
-    collects: "The screening report, shared only with the psychologist you are referred to.",
+    title: "Share your report with a psychologist",
+    body: "Allows us to send your screening report to a psychologist, but only if you are referred to one.",
+    keep: "Your screening report, shared only with that psychologist.",
+    needsScreening: true,
   },
   referral: {
     title: "Referral to a psychologist",
-    body: "Let your gynaecologist refer you to a psychologist for further support.",
-    collects: "The referral record and the details needed to contact the psychologist.",
+    body: "Allows us to refer you to a psychologist for extra support, and share your contact details with them.",
+    keep: "Your referral record and contact details.",
+    needsScreening: false,
   },
 };
 
 const STATE_LABEL: Record<ConsentState, string> = {
   not_asked: "Not yet asked",
   granted: "Granted",
-  revoked: "Revoked",
+  revoked: "Withdrawn",
 };
+
+// Left rule colour carries the state too, but the text label always does as well (never colour alone).
+const STATE_RULE: Record<ConsentState, string> = {
+  not_asked: "border-l-stone-300",
+  granted: "border-l-[#0f5e5a]",
+  revoked: "border-l-stone-700",
+};
+
+const BUTTON_BASE =
+  "rounded px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f5e5a] disabled:opacity-50";
+const PRIMARY = `${BUTTON_BASE} bg-[#0f5e5a] text-white hover:bg-[#0b4a47]`;
+const SECONDARY = `${BUTTON_BASE} border border-stone-500 text-stone-900 hover:bg-stone-100`;
 
 export function ConsentDemo({ patient }: { patient: DemoPatient }) {
   const [consents, setConsents] = useState<Record<ConsentPurpose, ConsentState>>(patient.consents);
+  const [confirming, setConfirming] = useState<ConsentPurpose | null>(null);
+  const [history, setHistory] = useState<string[]>([]);
 
-  const set = (purpose: ConsentPurpose, state: ConsentState) =>
-    setConsents((prev) => ({ ...prev, [purpose]: state }));
+  const record = (purpose: ConsentPurpose, next: ConsentState, event: string) => {
+    setConsents((prev) => ({ ...prev, [purpose]: next }));
+    setConfirming(null);
+    const time = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    setHistory((prev) => [`${time} · ${PURPOSE[purpose].title}: ${event}`, ...prev]);
+  };
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-10">
-      <p className="text-sm text-zinc-500">Patient: {patient.label}</p>
-      <h1 className="mt-1 text-2xl font-semibold">Consent</h1>
-      <p className="mt-3 text-zinc-600">
-        Each purpose is agreed separately. You can change a choice at any time.
-      </p>
+    <main className="mx-auto max-w-2xl px-6 py-10 text-stone-900">
+      <header className="border-b border-stone-300 pb-5">
+        <p className="text-sm text-stone-700">Clinical record consent</p>
+        <h1 className="mt-1 font-serif text-3xl">{patient.label}</h1>
+        <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+          <dt className="text-stone-700">Record number</dt>
+          <dd>{patient.recordNumber}</dd>
+          <dt className="text-stone-700">Date of birth</dt>
+          <dd>{patient.dateOfBirth}</dd>
+          <dt className="text-stone-700">Consent text</dt>
+          <dd>{CONSENT_TEXT_VERSION}</dd>
+        </dl>
+      </header>
 
-      <ul className="mt-8 space-y-4">
+      <ul className="mt-8 space-y-5">
         {CONSENT_PURPOSES.map((purpose) => {
-          const text = PURPOSE_TEXT[purpose];
+          const text = PURPOSE[purpose];
           const state = consents[purpose];
+          const blocked = text.needsScreening && consents.screening !== "granted";
+          const titleId = `purpose-${purpose}`;
           return (
-            <li key={purpose} className="rounded-lg border border-zinc-200 p-5">
+            <li key={purpose} className={`border-l-4 bg-white p-5 ${STATE_RULE[state]}`}>
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="font-medium">{text.title}</h2>
-                  <p className="mt-1 text-sm text-zinc-600">{text.body}</p>
-                  <p className="mt-2 text-xs text-zinc-500">Collects: {text.collects}</p>
-                </div>
-                <span className="shrink-0 rounded bg-zinc-100 px-2 py-1 text-xs text-zinc-700">
+                <h2 id={titleId} className="text-lg font-medium">
+                  {text.title}
+                </h2>
+                <span role="status" className="shrink-0 text-sm font-medium">
                   {STATE_LABEL[state]}
                 </span>
               </div>
-              <div className="mt-4 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => set(purpose, "granted")}
-                  className="rounded bg-zinc-900 px-3 py-1.5 text-sm text-white"
-                >
-                  Grant
-                </button>
-                <button
-                  type="button"
-                  onClick={() => set(purpose, "revoked")}
-                  className="rounded border border-zinc-300 px-3 py-1.5 text-sm"
-                >
-                  Revoke
-                </button>
-                <button
-                  type="button"
-                  onClick={() => set(purpose, "not_asked")}
-                  className="rounded px-3 py-1.5 text-sm text-zinc-500"
-                >
-                  Reset
-                </button>
-              </div>
+              <p className="mt-2 text-stone-800">{text.body}</p>
+              <p className="mt-2 text-sm text-stone-700">We will keep: {text.keep}</p>
+
+              {blocked ? (
+                <p className="mt-4 text-sm text-stone-800">
+                  Needs screening consent first. Rule to confirm with GV.
+                </p>
+              ) : confirming === purpose ? (
+                <div className="mt-4 rounded border border-stone-400 bg-stone-50 p-4 text-sm">
+                  <p className="font-medium">Withdraw consent for {text.title.toLowerCase()}?</p>
+                  <p className="mt-1 text-stone-800">
+                    This stops any future use. What happens to existing records is still to be
+                    decided (G-17).
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      type="button"
+                      className={PRIMARY}
+                      aria-label={`Confirm withdrawal of consent for ${text.title}`}
+                      onClick={() => record(purpose, "revoked", "consent withdrawn")}
+                    >
+                      Confirm withdrawal
+                    </button>
+                    <button
+                      type="button"
+                      className={SECONDARY}
+                      onClick={() => setConfirming(null)}
+                    >
+                      Keep consent
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {state === "not_asked" && (
+                    <>
+                      <button
+                        type="button"
+                        className={PRIMARY}
+                        aria-label={`Record consent for ${text.title}`}
+                        onClick={() => record(purpose, "granted", "consent recorded")}
+                      >
+                        Record consent
+                      </button>
+                      <button
+                        type="button"
+                        className={SECONDARY}
+                        aria-label={`Record refusal for ${text.title}`}
+                        onClick={() => record(purpose, "revoked", "refusal recorded")}
+                      >
+                        Record refusal
+                      </button>
+                    </>
+                  )}
+                  {state === "granted" && (
+                    <button
+                      type="button"
+                      className={SECONDARY}
+                      aria-label={`Record withdrawal for ${text.title}`}
+                      onClick={() => setConfirming(purpose)}
+                    >
+                      Record withdrawal
+                    </button>
+                  )}
+                  {state === "revoked" && (
+                    <button
+                      type="button"
+                      className={PRIMARY}
+                      aria-label={`Record consent again for ${text.title}`}
+                      onClick={() => record(purpose, "granted", "consent recorded again")}
+                    >
+                      Record consent again
+                    </button>
+                  )}
+                </div>
+              )}
             </li>
           );
         })}
       </ul>
 
-      <aside className="mt-8 rounded-lg bg-zinc-50 p-5 text-sm text-zinc-700">
-        <p className="font-medium">For GV to confirm</p>
+      <section aria-labelledby="history-heading" className="mt-10">
+        <h2 id="history-heading" className="text-lg font-medium">
+          History
+        </h2>
+        {history.length === 0 ? (
+          <p className="mt-2 text-sm text-stone-700">No changes made in this session.</p>
+        ) : (
+          <ol className="mt-2 space-y-1 text-sm">
+            {history.map((entry, i) => (
+              <li key={i}>{entry}</li>
+            ))}
+          </ol>
+        )}
+        <p className="mt-3 text-xs text-stone-700">
+          Demo only: a real record is append-only, with the clinician and method captured, and is
+          stored in the database.
+        </p>
+      </section>
+
+      <aside className="mt-10 border border-dashed border-stone-500 p-5 text-sm text-stone-800">
+        <p className="font-medium">Reviewer notes for GV (demo only, remove before build)</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>Should sharing with a psychologist require screening consent first?</li>
-          <li>Revoking stops future use. What happens to existing records is pending (G-17).</li>
-          <li>The consent wording above is placeholder text, pending legal review (G-25).</li>
+          <li>Who sees this screen: the clinician, or the patient? The copy is written to be read to the patient.</li>
+          <li>Should sharing with a psychologist require screening consent first? The demo enforces it.</li>
+          <li>Withdrawal stops future use. What happens to existing records is pending (G-17).</li>
+          <li>Wording is placeholder until legal review (G-25). It must also say that a self-harm answer triggers a safety alert, who can see results, that scores are not a diagnosis, and how long data is kept.</li>
         </ul>
       </aside>
     </main>
