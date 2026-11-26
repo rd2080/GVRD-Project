@@ -12,6 +12,7 @@
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs"
   },
   "dependencies": {
+    "better-auth": "^1.7.28",
     "next": "16.4.6",
     "pg": "^8.23.1",
     "react": "19.3.0",
