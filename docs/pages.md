@@ -31,7 +31,7 @@ Admins create clinician accounts and reset MFA. There is no self sign-up (ADR-00
 | `/patients/new` | Register a patient | Clinicians | Yes | G-11, G-16 |
 | `/patients/[id]` | Patient profile: details, consent status, recent assessments | Clinicians | Yes | G-14 |
 | `/patients/[id]/history` | Medical, gynaecological and psychological history | Clinicians | Yes | G-10 |
-| `/patients/[id]/consent` | Record consent for each purpose, with the text version | Clinicians | Yes | G-14 |
+| `/patients/[id]` (dialog) | Review consent with the patient, with the text version. Opened from the profile, not a separate page | Clinicians | Yes | G-14 |
 | `/patients/[id]/assessments` | List of assessments for this patient | Clinicians | Yes | None |
 | `/patients/[id]/assessments/new` | Start an assessment: PHQ-9, GAD-7 or EPDS | Clinicians | Yes | G-01, D-01 |
 | `/patients/[id]/assessments/[assessmentId]` | Scores, flags and status | Clinicians | Yes | G-04 |
@@ -49,7 +49,7 @@ Patients do not have accounts yet, so access is through a link the clinician ope
 | Route | Page | Who | MVP | Depends on |
 |---|---|---|---|---|
 | `/assess/[token]` | Questionnaire, one question per screen, with progress | Patients | Yes | G-19, G-35 |
-| `/assess/[token]/consent` | Patient consent before answering | Patients | Yes | G-14 |
+| `/assess/[token]/consent` | Patient gives consent before answering. Shows no record number, date of birth or clinical summary | Patients | Yes | G-14 |
 | `/assess/[token]/done` | Completion screen with a crisis resource and next steps | Patients | Yes | G-08 |
 | `/assess/[token]/expired` | Link expired or already used | Patients | Yes | G-15 |
 

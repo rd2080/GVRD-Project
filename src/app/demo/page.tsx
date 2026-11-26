@@ -19,8 +19,8 @@ export default function DemoIndex() {
             C-01 Consent
           </h2>
           <p className="mt-1 text-sm text-stone-700">Version v0.1 · Waiting for GV review</p>
-          <p className="mt-1 text-sm text-stone-700">Consent is a dialog on the patient record, given by the patient.</p>
-          <p className="mt-4 text-sm font-medium">Open an example patient record</p>
+          <p className="mt-1 text-sm text-stone-700">Clinician: review consent in a dialog on the patient record. Patient: their own page, with no clinical record shown.</p>
+          <p className="mt-4 text-sm font-medium">Clinician view, example patient record</p>
           <ul className="mt-2 space-y-2">
             {listDemoPatients().map((p) => (
               <li key={p.id}>
@@ -29,6 +29,19 @@ export default function DemoIndex() {
                   href={`/patients/${p.id}`}
                 >
                   {p.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm font-medium">Patient view, same example patient</p>
+          <ul className="mt-2 space-y-2">
+            {listDemoPatients().map((p) => (
+              <li key={`own-${p.id}`}>
+                <Link
+                  className="text-[#0f5e5a] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f5e5a]"
+                  href={`/assess/${p.id}/consent`}
+                >
+                  {p.label}, own consent page
                 </Link>
               </li>
             ))}
