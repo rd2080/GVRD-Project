@@ -11,7 +11,7 @@ import {
 // Wording is placeholder until legal review (G-25) and consent versioning (G-14) are done.
 const CONSENT_TEXT_VERSION = "v0.1 (placeholder)";
 
-// Plain language, written to be read aloud to the patient.
+// Plain language. This screen is read aloud to the patient, and the clinician records what she says.
 const PURPOSE: Record<
   ConsentPurpose,
   { title: string; body: string; keep: string; needsScreening: boolean }
@@ -38,9 +38,9 @@ const PURPOSE: Record<
 
 const STATE_LABEL: Record<ConsentState, string> = {
   not_asked: "Not yet asked",
-  granted: "Granted",
-  refused: "Refused",
-  revoked: "Withdrawn",
+  granted: "Agreed",
+  refused: "Did not agree",
+  revoked: "Stopped",
 };
 
 // Left rule colour carries the state too, but the text label always does as well (never colour alone).
@@ -57,14 +57,14 @@ const PRIMARY = `${BUTTON_BASE} bg-[#0f5e5a] text-white hover:bg-[#0b4a47]`;
 const SECONDARY = `${BUTTON_BASE} border border-stone-500 text-stone-900 hover:bg-stone-100`;
 
 const titleId = (purpose: ConsentPurpose) => `purpose-${purpose}`;
+const confirmId = (purpose: ConsentPurpose) => `confirm-${purpose}`;
 
 export function ConsentDemo({ patient }: { patient: DemoPatient }) {
   const [consents, setConsents] = useState<Record<ConsentPurpose, ConsentState>>(patient.consents);
   const [confirming, setConfirming] = useState<ConsentPurpose | null>(null);
   const [history, setHistory] = useState<string[]>([]);
 
-  const focusPurpose = (purpose: ConsentPurpose) =>
-    requestAnimationFrame(() => document.getElementById(titleId(purpose))?.focus());
+  const focusId = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus());
 
   const stamp = () => new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
@@ -83,11 +83,17 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
     }));
     const entries = [logEvent(purpose, event)];
     if (cascade) {
-      entries.push(logEvent("share_report_with_psychologist", "withdrawn because screening was withdrawn"));
+      entries.push(logEvent("share_report_with_psychologist", "stopped because screening was stopped"));
     }
     setHistory((h) => [...entries, ...h]);
     // The pressed buttons may disappear, so move focus to the purpose heading, not the page body.
-    focusPurpose(purpose);
+    focusId(titleId(purpose));
+  };
+
+  const startWithdrawal = (purpose: ConsentPurpose) => {
+    setConfirming(purpose);
+    // Focus the question, not a button, so a stray keypress cannot make the change.
+    focusId(confirmId(purpose));
   };
 
   return (
@@ -117,7 +123,7 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
           </li>
           <li>
             If you feel unsafe right now, call your local emergency number or go to the nearest
-            emergency department. A helpline number will be shown here once it is approved (G-08).
+            emergency department.
           </li>
           <li>Only your gynaecologist and the team they choose can see your results.</li>
           <li>We are still confirming how long we keep your information.</li>
@@ -143,33 +149,34 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
               <p className="mt-2 text-sm text-stone-700">We will keep: {text.keep}</p>
 
               {blocked && state !== "granted" ? (
-                <p className="mt-4 text-sm text-stone-800">Needs screening consent first.</p>
+                <p className="mt-4 text-sm text-stone-800">You need to agree to screening first.</p>
               ) : confirming === purpose ? (
                 <div className="mt-4 rounded border border-stone-400 bg-stone-50 p-4 text-sm">
-                  <p className="font-medium">{`Withdraw consent for "${text.title}"?`}</p>
+                  <p id={confirmId(purpose)} tabIndex={-1} className="font-medium focus:outline-none">
+                    {`Do you want to stop agreeing to "${text.title}"?`}
+                  </p>
                   <p className="mt-1 text-stone-800">
-                    This stops any future use. We are still confirming what happens to records you
-                    have already given.
+                    We will stop using this from now on. We are still confirming what happens to
+                    records you have already given.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      autoFocus
                       className={PRIMARY}
-                      aria-label={`Confirm withdrawal of consent for ${text.title}`}
-                      onClick={() => record(purpose, "revoked", "consent withdrawn")}
+                      aria-label={`Yes, stop agreeing to ${text.title}`}
+                      onClick={() => record(purpose, "revoked", "stopped")}
                     >
-                      Confirm withdrawal
+                      Yes, I want to stop
                     </button>
                     <button
                       type="button"
                       className={SECONDARY}
                       onClick={() => {
                         setConfirming(null);
-                        focusPurpose(purpose);
+                        focusId(titleId(purpose));
                       }}
                     >
-                      Keep consent
+                      No, keep agreeing
                     </button>
                   </div>
                 </div>
@@ -180,19 +187,19 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                       <button
                         type="button"
                         className={PRIMARY}
-                        aria-label={`Record consent for ${text.title}`}
-                        onClick={() => record(purpose, "granted", "consent recorded")}
+                        aria-label={`I agree to ${text.title}`}
+                        onClick={() => record(purpose, "granted", "agreed")}
                       >
-                        Record consent
+                        I agree
                       </button>
                       {state === "not_asked" && (
                         <button
                           type="button"
                           className={SECONDARY}
-                          aria-label={`Record refusal for ${text.title}`}
-                          onClick={() => record(purpose, "refused", "refusal recorded")}
+                          aria-label={`I do not agree to ${text.title}`}
+                          onClick={() => record(purpose, "refused", "did not agree")}
                         >
-                          Record refusal
+                          I do not agree
                         </button>
                       )}
                     </>
@@ -201,20 +208,20 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
                     <button
                       type="button"
                       className={SECONDARY}
-                      aria-label={`Record withdrawal for ${text.title}`}
-                      onClick={() => setConfirming(purpose)}
+                      aria-label={`I want to stop agreeing to ${text.title}`}
+                      onClick={() => startWithdrawal(purpose)}
                     >
-                      Record withdrawal
+                      I want to stop
                     </button>
                   )}
                   {state === "revoked" && (
                     <button
                       type="button"
                       className={PRIMARY}
-                      aria-label={`Record consent again for ${text.title}`}
-                      onClick={() => record(purpose, "granted", "consent recorded again")}
+                      aria-label={`I agree again to ${text.title}`}
+                      onClick={() => record(purpose, "granted", "agreed again")}
                     >
-                      Record consent again
+                      I agree again
                     </button>
                   )}
                 </div>
@@ -237,17 +244,6 @@ export function ConsentDemo({ patient }: { patient: DemoPatient }) {
           ))}
         </ol>
       </section>
-
-      <aside className="mt-10 border border-dashed border-stone-500 p-5 text-sm text-stone-800">
-        <p className="font-medium">Reviewer notes for GV (demo only, remove before build)</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>Who sees this screen: the clinician, or the patient? The copy is written to be read to the patient.</li>
-          <li>Withdrawing screening withdraws sharing with a psychologist too. The demo does this, with a history entry. GV to confirm.</li>
-          <li>Withdrawal stops future use. What happens to existing records is pending (G-17).</li>
-          <li>The &ldquo;What you should know&rdquo; wording is placeholder until legal review (G-25). The safety alert and helpline text must match the pathway GV approves (G-07, G-08).</li>
-          <li>Demo only: a real record is append-only and stored in the database, with the clinician and method captured.</li>
-        </ul>
-      </aside>
     </main>
   );
 }

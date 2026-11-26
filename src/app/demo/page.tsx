@@ -5,7 +5,7 @@ import { DemoBanner, NotAvailable } from "./banner";
 
 export const dynamic = "force-dynamic";
 
-// Index of demo screens for review. Each screen is listed once, with its version and example patients.
+// Index of demo screens for review. Reviewer notes live here, not on the patient-facing screens.
 export default function DemoIndex() {
   if (!isDemoMode()) return <NotAvailable />;
 
@@ -33,6 +33,22 @@ export default function DemoIndex() {
                 </Link>
               </li>
             ))}
+          </ul>
+        </section>
+
+        <section aria-labelledby="notes-heading" className="mt-8 border border-dashed border-stone-500 p-5 text-sm text-stone-800">
+          <h2 id="notes-heading" className="font-medium">
+            Reviewer notes for GV (C-01, demo only)
+          </h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            <li>Who uses this screen? The clinician records what the patient says, and the wording is read aloud to the patient. Confirm.</li>
+            <li>Withdrawing screening withdraws sharing with a psychologist too. The demo does this, with a history entry. Confirm.</li>
+            <li>Sharing needs screening consent first. The demo enforces this.</li>
+            <li>What happens to existing records after a patient stops agreeing is pending (G-17).</li>
+            <li>The &ldquo;What you should know&rdquo; wording is placeholder until legal review (G-25).</li>
+            <li>The safety alert wording must match the pathway GV approves (G-07).</li>
+            <li>An approved helpline number must be added beside the emergency guidance (G-08). The demo has none yet.</li>
+            <li>A real record is append-only and stored in the database, with the clinician and method captured.</li>
           </ul>
         </section>
       </main>
