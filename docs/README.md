@@ -12,5 +12,6 @@ Index of the technical documentation. Status values: **Draft** (written, not rev
 | [scoring-spec.md](scoring-spec.md) | Instrument items, scoring rules and versions | Pending approval |
 | [environments-and-deployment.md](environments-and-deployment.md) | Environments, Vercel settings, migration order | Draft |
 | [subprocessors.md](subprocessors.md) | Third parties that handle data | Draft |
+| [pages.md](pages.md) | Every app page, who uses it, MVP scope and blocking decisions | Proposed |
 
 Open questions and decisions are tracked in the GVRD Decisions, Gaps and Risks Tracker (Google Sheet), using the IDs G-xx and D-xx.
